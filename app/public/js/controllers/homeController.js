@@ -7,6 +7,9 @@ function HomeController()
 // handle user logout //
 	$('#btn-logout').click(function(){ that.attemptLogout(); });
 
+// handle user map //
+	$('#btn-map').click(function(){ that.goMap(); });
+
 // confirm account deletion //
 	$('#account-form-btn1').click(function(){$('.modal-confirm').modal('show')});
 
@@ -43,6 +46,16 @@ function HomeController()
 			error: function(jqXHR){
 				console.log(jqXHR.responseText+' :: '+jqXHR.statusText);
 			}
+		});
+	}
+
+    this.goMap = function()
+	{
+		var that = this;
+		$.ajax({
+			url: "/map",
+			type: "POST"
+			
 		});
 	}
 

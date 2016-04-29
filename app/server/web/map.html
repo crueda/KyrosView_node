@@ -44,7 +44,7 @@
     width: 100px;
   }
   .ol-mouse-position {
-    right: 3em;
+    right: 6em;
     color: #fff;
     background-color: rgba(0,60,136,.5);
     padding: 2px 10px;
@@ -86,6 +86,17 @@
     background-image: url("/img/placa2.png");
 }
 
+#attr-conf
+{
+    position:absolute; 
+    right:5px; 
+    top: 5px; 
+    z-index:10000; 
+    width:48px; 
+    height:48px; 
+    background-image: url("/img/conf.png");
+}
+     
 }
 </style>
 
@@ -98,7 +109,7 @@
 
 
 <script>
- window.onload = function() { initLayer(); setInterval(reloadLayer,1000); };
+ window.onload = function() { setInterval(reloadLayer,1000); };
 
  $(document).ready(function() {
   $.ajaxSetup({ cache: false });
@@ -114,6 +125,7 @@
     <div class="span12">
      <div id="map" class="map">
      <div id="attr"></div>
+     <div id="attr-conf" onclick="javascript:location.href='http://localhost:3000/home'"></div>
       <div id="info"></div>
     </div>
   </div>
@@ -161,7 +173,28 @@
     return null;
     }
   }
+    
+function getGETuser() {
+    // capturamos la url
+    var loc = document.location.href;
+    // si existe el interrogante
+    if(loc.indexOf('?')>0) {
+      // cogemos la parte de la url que hay despues del interrogante
+      var getString = loc.split('?')[1];
+      // obtenemos un array con cada clave=valor
+      var GET = getString.split('&');
+      var get = {};
 
+      // recorremos todo el array de valores
+      for(var i = 0, l = GET.length; i < l; i++){
+        var tmp = GET[i].split('=');
+        get[tmp[0]] = unescape(decodeURI(tmp[1]));
+        if (unescape(decodeURI(tmp[0])) == 'user')
+          return unescape(decodeURI(tmp[1]));
+        }
+    return null;
+    }
+  }
 
        var vectorSource = new ol.source.Vector({
          features: []
@@ -447,6 +480,8 @@ function initLayer() {
 }
 
 function reloadLayer() {
+ user = getGETuser();
+
  $.getJSON( "/json/tracking_wrc.json", function( data ) {
    var items = [];
    $.each( data, function( key, val ) {

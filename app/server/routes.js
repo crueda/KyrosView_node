@@ -5,7 +5,15 @@ var EM = require('./modules/email-dispatcher');
 
 module.exports = function(app) {
 
-// main login page //
+    // set the view engine to ejs
+    //app.set('view engine', 'ejs');
+    
+    //app.engine('jade', require('jade').__express);
+    //app.engine('html', require('ejs').renderFile);
+    app.set('view engine', 'ejs');
+    app.set('view engine', 'jade');
+    
+    // main login page //
 	app.get('/', function(req, res){
 	// check if the user's credentials are saved in a cookie //
 		if (req.cookies.user == undefined || req.cookies.pass == undefined){
@@ -59,7 +67,13 @@ module.exports = function(app) {
 	// if user is not logged-in redirect back to login page //
 			res.redirect('/');
 		}	else{
-            res.sendFile(__dirname+'/web/map.html');
+            //res.sendFile(__dirname+'/web/map.html');
+            res.render('map.ejs', {
+                user : req.session.user.username
+			});
+            
+            //res.render('map', { title: 'ejs' })
+            //res.render('map2');
 			/*res.render('map', {
 				title : 'Kyros View',
                 countries : CT,
@@ -67,7 +81,22 @@ module.exports = function(app) {
 			});*/
 		}
 	});
-	
+
+    app.post('/map', function(req, res) {
+		if (req.session.user == null){
+	// if user is not logged-in redirect back to login page //
+			res.redirect('/');
+		}	else{
+            //res.sendFile(__dirname+'/web/map.html');
+            //res.render('map');
+			res.render('map', {
+				title : 'Kyros View',
+                countries : CT,
+				udata : req.session.user
+			});
+		}
+	});
+
 	app.post('/home', function(req, res){
 		if (req.session.user == null){
 			res.redirect('/');
@@ -201,5 +230,5 @@ module.exports = function(app) {
 	
 	app.get('*', function(req, res) { res.render('404', { title: 'Page Not Found'}); });
 
-    app.use(express.static(__dirname + '/public'));
+    //app.use(express.static(__dirname + '/public'));
 };

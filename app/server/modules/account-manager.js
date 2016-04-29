@@ -2,11 +2,9 @@ var crypto 		= require('crypto');
 var mysql         = require('mysql');
 var moment 		= require('moment');
 
-
 /*
 	ESTABLISH DATABASE CONNECTION
 */
-
 
 var dbMysqlName = process.env.DB_MYSQL_NAME || 'nodeLogin';
 var dbMysqlHost = process.env.DB_MYSQL_HOST || 'localhost'
@@ -25,8 +23,6 @@ var dbConfig = {
 };
 
 var pool = mysql.createPool(dbConfig);
-
-
 
 
 exports.autoLogin = function(user, pass, callback)
@@ -59,6 +55,7 @@ exports.manualLogin = function(user, pass, callback)
         if (connection) {        
             var sql = "SELECT USERNAME as username, PASSWORD as password FROM USER_GUI WHERE USERNAME= '" + user + "'";
             console.log ("Query2: "+sql);
+            console.log ("pass: "+pass);
             connection.query(sql, function(error, rows)
             {
               connection.release();
