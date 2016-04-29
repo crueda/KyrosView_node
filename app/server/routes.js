@@ -15,7 +15,8 @@ module.exports = function(app) {
 			AM.autoLogin(req.cookies.user, req.cookies.pass, function(o){
 				if (o != null){
 				    req.session.user = o;
-					res.redirect('/home');
+					//res.redirect('/home');
+					res.redirect('/map');
 				}	else{
 					res.render('login', { title: 'Hello - Please Login To Your Account' });
 				}
@@ -26,12 +27,8 @@ module.exports = function(app) {
 	app.post('/', function(req, res){
 		AM.manualLogin(req.body['user'], req.body['pass'], function(e, o){
 			if (!o){
-                                console.log("*RR*>"+o);
 				res.status(400).send(e);
 			}	else{
-                                console.log("**>"+o);
-                console.log("**>"+o.username);
-
 				req.session.user = o;
 				if (req.body['remember-me'] == 'true'){
 					res.cookie('user', o.user, { maxAge: 900000 });
@@ -54,6 +51,20 @@ module.exports = function(app) {
 				countries : CT,
 				udata : req.session.user
 			});
+		}
+	});
+    
+    app.get('/map', function(req, res) {
+		if (req.session.user == null){
+	// if user is not logged-in redirect back to login page //
+			res.redirect('/');
+		}	else{
+            res.sendFile(__dirname+'/web/map.html');
+			/*res.render('map', {
+				title : 'Kyros View',
+                countries : CT,
+				udata : req.session.user
+			});*/
 		}
 	});
 	
@@ -190,4 +201,5 @@ module.exports = function(app) {
 	
 	app.get('*', function(req, res) { res.render('404', { title: 'Page Not Found'}); });
 
+    app.use(express.static(__dirname + '/public'));
 };

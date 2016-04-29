@@ -1,38 +1,12 @@
 var crypto 		= require('crypto');
 var mysql         = require('mysql');
 var moment 		= require('moment');
-var MongoDB 	= require('mongodb').Db;
-var Server 		= require('mongodb').Server;
+
 
 /*
 	ESTABLISH DATABASE CONNECTION
 */
 
-var dbName = process.env.DB_NAME || 'node-login';
-var dbHost = process.env.DB_HOST || 'localhost'
-var dbPort = process.env.DB_PORT || 27017;
-
-var db = new MongoDB(dbName, new Server(dbHost, dbPort, {auto_reconnect: true}), {w: 1});
-db.open(function(e, d){
-	if (e) {
-		console.log(e);
-	} else {
-		if (process.env.NODE_ENV == 'live') {
-			db.authenticate(process.env.DB_USER, process.env.DB_PASS, function(e, res) {
-				if (e) {
-					console.log('mongo :: error: not authenticated', e);
-				}
-				else {
-					console.log('mongo :: authenticated and connected to database :: "'+dbName+'"');
-				}
-			});
-		}	else{
-			console.log('mongo :: connected to database :: "'+dbName+'"');
-		}
-	}
-});
-
-var accounts = db.collection('accounts');
 
 var dbMysqlName = process.env.DB_MYSQL_NAME || 'nodeLogin';
 var dbMysqlHost = process.env.DB_MYSQL_HOST || 'localhost'
@@ -53,36 +27,7 @@ var dbConfig = {
 var pool = mysql.createPool(dbConfig);
 
 
-/* login validation methods */
 
-/*exports.autoLogin = function(user, pass, callback)
-{
-	accounts.findOne({user:user}, function(e, o) {
-		if (o){
-			o.pass == pass ? callback(o) : callback(null);
-		}	else{
-			callback(null);
-		}
-	});
-}
-
-exports.manualLogin = function(user, pass, callback)
-{
-	accounts.findOne({user:user}, function(e, o) {
-		if (o == null){
-			callback('user-not-found');
-		}	else{
-			validatePassword(pass, o.pass, function(err, res) {
-				if (res){
-					callback(null, o);
-				}	else{
-					callback('invalid-password');
-				}
-			});
-		}
-	});
-}
-*/
 
 exports.autoLogin = function(user, pass, callback)
 {
