@@ -47,6 +47,8 @@ app.use(session({
 	secret: 'faeb4453e5d14fe6f6d04637f78077c76c73d1b4',
     proxy: true,
 	store: sessionStore,
+    checkExpirationInterval: 900000,// How frequently expired sessions will be cleared; milliseconds. 
+	expiration: 86400000,// The maximum age of a valid session; milliseconds. 
 	resave: true,
 	saveUninitialized: true
 }));

@@ -14,8 +14,8 @@ var dbMysqlPass = process.env.DB_MYSQL_PASS || 'root';
 
 var dbConfig = {
     host: dbMysqlHost,
-    user: dbMysqlUser ,
-    password: dbMysqlPass ,
+    user: dbMysqlUser,
+    password: dbMysqlPass,
     database: dbMysqlName,
     connectionLimit: 50,
     queueLimit: 0,
@@ -73,15 +73,63 @@ exports.manualLogin = function(user, pass, callback)
         } else {
             callback(null);
         }
-    });    
-    
-    
+    });            
 }
 
 
 /* record insertion, update & deletion methods */
-
 exports.addNewAccount = function(newData, callback)
+{
+    pool.getConnection(function(err, connection) {
+        if (connection) {        
+            var sqlUser = "SELECT * FROM USER_GUI WHERE USERNAME= '" + newData.user + "'";
+            console.log ("Query: "+sqlUser);
+            connection.query(sqlUser, function(error, row) {
+              if(error) {
+                callback('db-error');
+              } else {
+                  if(row[0] != undefined) {
+                      callback('username-taken');
+                  } else {
+                      var sqlEmail = "SELECT * FROM USER_GUI WHERE EMAIL= '" + newData.email + "'";
+                      console.log ("Query: "+sqlEmail);
+                      connection.query(sqlEmail, function(error, row2) {
+                      if(error) {
+                        callback(null);
+                      } else {
+                        if(row[0] != undefined) {
+                            callback('email-taken');
+                        } else {
+                            saltAndHash(newData.pass, function(hash){
+						      newData.pass = hash;
+					          // append date stamp when record was created //
+						      newData.date = moment().format('MMMM Do YYYY, h:mm:ss a');
+						      //accounts.insert(newData, {safe: true}, callback);
+					           var sqlInsert = "INSERT INTO USER_GUI SET EMAIL= '" + newData.email + "',USERNAME='" + newData.user + "',PASSWORD='" + newData.pass + "' ,CREATED='" + newData.date + "'";
+                               console.log ("Query: "+sqlInsert);
+                               connection.query(sqlInsert, function(error, result) {
+                                connection.release();
+                                if(error) {
+                                    callback('db-error');
+                                } else {
+                                    callback(null);
+                                }					                                   
+                                }); // insert
+                            });  // saltAndHash
+                        }
+                      }
+                    }); // sqlEmail                      
+                    }
+                }
+                }); // sqlUsername  
+        } else { // connection
+            callback('db-error');
+        }
+    });            
+}
+
+
+exports.addNewAccount0 = function(newData, callback)
 {
 	accounts.findOne({user:newData.user}, function(e, o) {
 		if (o){

@@ -46,13 +46,19 @@ function AccountValidator()
 AccountValidator.prototype.showInvalidEmail = function()
 {
 	this.controlGroups[1].addClass('error');
-	this.showErrors(['That email address is already in use.']);
+	this.showErrors(['That email address is already in use']);
 }
 
 AccountValidator.prototype.showInvalidUserName = function()
 {
 	this.controlGroups[2].addClass('error');
-	this.showErrors(['That username is already in use.']);
+	this.showErrors(['That username is already in use']);
+}
+
+AccountValidator.prototype.showGenericError = function()
+{
+	this.controlGroups[2].addClass('error');
+	this.showErrors(['Server error, try it again']);
 }
 
 AccountValidator.prototype.validateForm = function()
