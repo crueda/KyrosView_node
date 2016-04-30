@@ -11,7 +11,8 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var errorHandler = require('errorhandler');
 var cookieParser = require('cookie-parser');
-var MongoStore = require('connect-mongo')(session);
+//var MongoStore = require('connect-mongo')(session);
+var MySQLStore = require('express-mysql-session')(session);
 
 var app = express();
 
@@ -25,8 +26,32 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(require('stylus').middleware({ src: __dirname + '/app/public' }));
 app.use(express.static(__dirname + '/app/public'));
 
-// build mongo database connection url //
+// build mysql database connection url //
+var dbMysqlName = process.env.DB_MYSQL_NAME || 'nodeLogin';
+var dbMysqlHost = process.env.DB_MYSQL_HOST || 'localhost'
+var dbMysqlPort = process.env.DB_MYSQL_PORT || 3306;
+var dbMysqlUser = process.env.DB_MYSQL_USER || 'root';
+var dbMysqlPass = process.env.DB_MYSQL_PASS || 'root';
 
+var options = {
+    host: dbMysqlHost,
+    user: dbMysqlUser,
+    password: dbMysqlPass,
+    database: dbMysqlName,
+};
+ 
+var sessionStore = new MySQLStore(options);
+
+app.use(session({
+	key: 'session_kyrosview_cookie',
+	secret: 'faeb4453e5d14fe6f6d04637f78077c76c73d1b4',
+    proxy: true,
+	store: sessionStore,
+	resave: true,
+	saveUninitialized: true
+}));
+
+/*
 var dbHost = process.env.DB_HOST || 'localhost'
 var dbPort = process.env.DB_PORT || 27017;
 var dbName = process.env.DB_NAME || 'node-login';
@@ -44,7 +69,7 @@ app.use(session({
 	saveUninitialized: true,
 	store: new MongoStore({ url: dbURL })
 	})
-);
+);*/
 
 require('./app/server/routes')(app);
 
