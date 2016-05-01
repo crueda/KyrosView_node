@@ -6,6 +6,8 @@ var moment 		= require('moment');
 	ESTABLISH DATABASE CONNECTION
 */
 
+var colors = require('colors');
+
 var dbMysqlName = process.env.DB_MYSQL_NAME || 'nodeLogin';
 var dbMysqlHost = process.env.DB_MYSQL_HOST || 'localhost'
 var dbMysqlPort = process.env.DB_MYSQL_PORT || 3306;
@@ -54,8 +56,10 @@ exports.manualLogin = function(user, pass, callback)
     pool.getConnection(function(err, connection) {
         if (connection) {        
             var sql = "SELECT USERNAME as username, PASSWORD as password FROM USER_GUI WHERE USERNAME= '" + user + "'";
+            console.log('hello'.green);
             console.log ("Query2: "+sql);
             console.log ("pass: "+pass);
+             //debugger;
             connection.query(sql, function(error, rows)
             {
               connection.release();
