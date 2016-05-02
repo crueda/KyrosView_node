@@ -3,6 +3,9 @@ var EM = {};
 module.exports = EM;
 
 var nodemailer = require('nodemailer');
+var PropertiesReader = require('properties-reader');
+
+var properties = PropertiesReader('./kyrosview.properties');
 
 EM.server = require("emailjs/email").server.connect(
 {
@@ -20,39 +23,48 @@ EM.dispatchResetPasswordLink = function(account, callback)
     console.log("-->"+account);
     console.log("-->"+account.email);
     
-    // create reusable transporter object using the default SMTP transport
-//var transporter = nodemailer.createTransport('smtps://crueda.cron%40gmail.com:dat123456@smtp.gmail.com');
-    
-    var mailer = require("nodemailer");
+var generator = require('xoauth2').createXOAuth2Generator({
+    user: properties.get('mail.user'),
+    clientId: properties.get('mail.clientId'),
+    clientSecret: properties.get('mail.clientSecret'),
+    refreshToken: properties.get('mail.refreshToken'),
+    accessToken: properties.get('mail.accessToken')
 
-    var nodemailer = require('nodemailer');
+});
 
-// create reusable transporter object using the default SMTP transport
-//var transporter = nodemailer.createTransport('smtps://crueda.cron%40gmail.com:dat123456@smtp.gmail.com');
-var transporter = nodemailer.createTransport({
-    service: 'Gmail',
+// listen for token updates
+// you probably want to store these to a db
+generator.on('token', function(token){
+    console.log('New token for %s: %s', token.user, token.accessToken);
+});
+
+
+// login
+var smtpTransport = nodemailer.createTransport({
+    service: 'gmail',
     auth: {
-        user: 'crueda.cron@gmail.com',
-        pass: 'dat123456'
+        xoauth2: generator
     }
 });
-    
-// setup e-mail data with unicode symbols
+
+
 var mailOptions = {
-    from: '"Fred Foo 👥" <crueda.cron@gmail.com>', // sender address
-    to: 'crueda@gmail.com', // list of receivers
-    subject: 'Hello ✔', // Subject line
-    text: 'Hello world 🐴', // plaintext body
-    html: '<b>Hello world 🐴</b>' // html body
+    to: "crueda@gmail.com",
+    subject: 'Hello ', // Subject line
+    text: 'Hello world ', // plaintext body
+    html: '<b>Hello world </b>' // html body
 };
 
-// send mail with defined transport object
-transporter.sendMail(mailOptions, function(error, info){
-    if(error){
-        return console.log(error);
-    }
+
+smtpTransport.sendMail(mailOptions, function(error, info) {
+  if (error) {
+    console.log(error);
+  } else {
     console.log('Message sent: ' + info.response);
+  }
+  smtpTransport.close();
 });
+
 
     
 // Use Smtp Protocol to send Email

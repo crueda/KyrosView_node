@@ -1,6 +1,9 @@
 var crypto 		= require('crypto');
 var mysql         = require('mysql');
 var moment 		= require('moment');
+var PropertiesReader = require('properties-reader');
+
+var properties = PropertiesReader('./kyrosview.properties');
 
 /*
 	ESTABLISH DATABASE CONNECTION
