@@ -128,29 +128,6 @@ exports.addNewAccount = function(newData, callback)
     });            
 }
 
-
-exports.addNewAccount0 = function(newData, callback)
-{
-	accounts.findOne({user:newData.user}, function(e, o) {
-		if (o){
-			callback('username-taken');
-		}	else{
-			accounts.findOne({email:newData.email}, function(e, o) {
-				if (o){
-					callback('email-taken');
-				}	else{
-					saltAndHash(newData.pass, function(hash){
-						newData.pass = hash;
-					// append date stamp when record was created //
-						newData.date = moment().format('MMMM Do YYYY, h:mm:ss a');
-						accounts.insert(newData, {safe: true}, callback);
-					});
-				}
-			});
-		}
-	});
-}
-
 exports.updateAccount = function(newData, callback)
 {
 	accounts.findOne({_id:getObjectId(newData.id)}, function(e, o){
@@ -197,7 +174,28 @@ exports.deleteAccount = function(id, callback)
 
 exports.getAccountByEmail = function(email, callback)
 {
-	accounts.findOne({email:email}, function(e, o){ callback(o); });
+	 //accounts.findOne({email:email}, function(e, o){ callback(o); });
+    
+     pool.getConnection(function(err, connection) {
+        if (connection) {        
+            var sql = "SELECT USERNAME as user, PASSWORD as pass, EMAIL as email FROM USER_GUI WHERE EMAIL= '" + email + "'";
+            console.log ("Query mail: "+sql);
+            connection.query(sql, function(error, rows)
+            {
+              connection.release();
+              if(error)
+              {
+                  callback('user-not-found');
+              }
+              else
+              {
+                  callback(rows[0]);
+              }
+            });
+        } else {
+            callback(null);
+        }
+    });           
 }
 
 exports.validateResetLink = function(email, passHash, callback)
