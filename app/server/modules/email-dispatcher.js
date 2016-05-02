@@ -23,48 +23,36 @@ EM.dispatchResetPasswordLink = function(account, callback)
     console.log("-->"+account);
     console.log("-->"+account.email);
     
-var generator = require('xoauth2').createXOAuth2Generator({
-    user: properties.get('mail.user'),
-    clientId: properties.get('mail.clientId'),
-    clientSecret: properties.get('mail.clientSecret'),
-    refreshToken: properties.get('mail.refreshToken'),
-    accessToken: properties.get('mail.accessToken')
+var nodemailer = require('nodemailer');
 
-});
+// create reusable transporter object using the default SMTP transport
+//var transporter = nodemailer.createTransport('smtps://user%40gmail.com:pass@smtp.gmail.com');
 
-// listen for token updates
-// you probably want to store these to a db
-generator.on('token', function(token){
-    console.log('New token for %s: %s', token.user, token.accessToken);
-});
-
-
-// login
-var smtpTransport = nodemailer.createTransport({
-    service: 'gmail',
+var transporter = nodemailer.createTransport({
+    service: 'Gmail',
     auth: {
-        xoauth2: generator
+        user: 'carlrue.cron@gmail.com',
+        pass: 'passss'
     }
 });
 
-
+// setup e-mail data with unicode symbols
 var mailOptions = {
-    to: "crueda@gmail.com",
-    subject: 'Hello ', // Subject line
-    text: 'Hello world ', // plaintext body
-    html: '<b>Hello world </b>' // html body
+    from: '"Fred Foo 👥" <foo@blurdybloop.com>', // sender address
+    to: 'crueda@gmail.com', // list of receivers
+    subject: 'Hello ✔', // Subject line
+    text: 'Hello world 🐴', // plaintext body
+    html: '<b>Hello world 🐴</b>' // html body
 };
 
-
-smtpTransport.sendMail(mailOptions, function(error, info) {
-  if (error) {
-    console.log(error);
-  } else {
+// send mail with defined transport object
+transporter.sendMail(mailOptions, function(error, info){
+    if(error){
+        return console.log(error);
+    }
     console.log('Message sent: ' + info.response);
-  }
-  smtpTransport.close();
 });
-
+    
 
     
 // Use Smtp Protocol to send Email
