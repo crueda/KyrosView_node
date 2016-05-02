@@ -54,6 +54,7 @@ module.exports = function(app) {
 	// if user is not logged-in redirect back to login page //
 			res.redirect('/');
 		}	else{
+            //console.log("-->" + req.session.user.username);
 			res.render('home', {
 				title : 'Control Panel',
 				countries : CT,
