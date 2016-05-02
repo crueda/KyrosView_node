@@ -6,6 +6,8 @@ var moment 		= require('moment');
 	ESTABLISH DATABASE CONNECTION
 */
 
+var colors = require('colors');
+
 var dbMysqlName = process.env.DB_MYSQL_NAME || 'nodeLogin';
 var dbMysqlHost = process.env.DB_MYSQL_HOST || 'localhost'
 var dbMysqlPort = process.env.DB_MYSQL_PORT || 3306;
@@ -54,14 +56,14 @@ exports.manualLogin = function(user, pass, callback)
     pool.getConnection(function(err, connection) {
         if (connection) {        
             var sql = "SELECT USERNAME as username, PASSWORD as password FROM USER_GUI WHERE USERNAME= '" + user + "'";
-            console.log ("Query2: "+sql);
-            console.log ("pass: "+pass);
+            console.log(colors.green('Query: %s'), sql);
+             //debugger;
             connection.query(sql, function(error, rows)
             {
               connection.release();
               if(error)
               {
-                  console.log ("e-->");
+                  console.log(colors.red('Query error: %s'), error);
                   callback('user-not-found');
               }
               else
