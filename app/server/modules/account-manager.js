@@ -85,7 +85,7 @@ exports.addNewAccount = function(newData, callback)
     pool.getConnection(function(err, connection) {
         if (connection) {        
             var sqlUser = "SELECT * FROM USER_GUI WHERE USERNAME= '" + newData.user + "'";
-            console.log ("Query: "+sqlUser);
+            console.log(colors.green('Query: %s'), sqlUser);
             connection.query(sqlUser, function(error, row) {
               if(error) {
                 callback('db-error');
@@ -94,7 +94,7 @@ exports.addNewAccount = function(newData, callback)
                       callback('username-taken');
                   } else {
                       var sqlEmail = "SELECT * FROM USER_GUI WHERE EMAIL= '" + newData.email + "'";
-                      console.log ("Query: "+sqlEmail);
+                      console.log(colors.green('Query: %s'), sqlEmail);
                       connection.query(sqlEmail, function(error, row2) {
                       if(error) {
                         callback(null);
@@ -108,7 +108,7 @@ exports.addNewAccount = function(newData, callback)
 						      newData.date = moment().format('MMMM Do YYYY, h:mm:ss a');
 						      //accounts.insert(newData, {safe: true}, callback);
 					           var sqlInsert = "INSERT INTO USER_GUI SET EMAIL= '" + newData.email + "',USERNAME='" + newData.user + "',PASSWORD='" + newData.pass + "' ,CREATED='" + newData.date + "'";
-                               console.log ("Query: "+sqlInsert);
+                               console.log(colors.green('Query: %s'), sqlInsert);
                                connection.query(sqlInsert, function(error, result) {
                                 connection.release();
                                 if(error) {
@@ -131,6 +131,31 @@ exports.addNewAccount = function(newData, callback)
 }
 
 exports.updateAccount = function(newData, callback)
+{
+    pool.getConnection(function(err, connection) {
+        if (connection) {        
+            var sql = "SELECT USERNAME as username, PASSWORD as password FROM USER_GUI WHERE USERNAME= '" + newData.user + "'";
+            console.log(colors.green('Query: %s'), sql);
+            connection.query(sql, function(error, rows)
+            {
+              connection.release();
+              if(error)
+              {
+                  console.log(colors.red('Query error: %s'), error);
+                  callback('user-not-found');
+              }
+              else
+              {
+                  callback(null, rows[0]);
+              }
+            });
+        } else {
+            callback(null);
+        }
+    });            
+}
+
+exports.updateAccount0 = function(newData, callback)
 {
 	accounts.findOne({_id:getObjectId(newData.id)}, function(e, o){
 		o.name 		= newData.name;
