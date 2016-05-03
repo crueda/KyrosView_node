@@ -13,10 +13,12 @@ $(document).ready(function(){
 			}
 		},
 		success	: function(responseText, status, xhr, $form){
+            console.log(">>>");
 			rv.showSuccess("Your password has been reset.");
 			setTimeout(function(){ window.location.href = '/'; }, 3000);
 		},
 		error : function(){
+            console.log("e>>>");
 			rv.showAlert("I'm sorry something went wrong, please try again.");
 		}
 	});

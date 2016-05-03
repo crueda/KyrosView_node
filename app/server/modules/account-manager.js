@@ -158,41 +158,42 @@ exports.updateAccount = function(newData, callback)
     });            
 }
 
-exports.updateAccount0 = function(newData, callback)
-{
-	accounts.findOne({_id:getObjectId(newData.id)}, function(e, o){
-		o.name 		= newData.name;
-		o.email 	= newData.email;
-		o.country 	= newData.country;
-		if (newData.pass == ''){
-			accounts.save(o, {safe: true}, function(e) {
-				if (e) callback(e);
-				else callback(null, o);
-			});
-		}	else{
-			saltAndHash(newData.pass, function(hash){
-				o.pass = hash;
-				accounts.save(o, {safe: true}, function(e) {
-					if (e) callback(e);
-					else callback(null, o);
-				});
-			});
-		}
-	});
-}
 
 exports.updatePassword = function(email, newPass, callback)
 {
-	accounts.findOne({email:email}, function(e, o){
-		if (e){
-			callback(e, null);
-		}	else{
-			saltAndHash(newPass, function(hash){
-		        o.pass = hash;
-		        accounts.save(o, {safe: true}, callback);
-			});
-		}
-	});
+     pool.getConnection(function(err, connection) {
+        if (connection) {        
+            var sql = "SELECT USERNAME as user, PASSWORD as pass, EMAIL as email FROM USER_GUI WHERE EMAIL= '" + email + "'";
+            console.log(colors.green('Query: %s'), sql);
+            connection.query(sql, function(error, rows)
+            {
+              if(error)
+              {
+                  callback(error, null);
+              }
+              else
+              {
+                  // actualizar el password
+                  saltAndHash(newPass, function(hash){
+				    newPass = hash;
+                    var sqlUpdate = "UPDATE USER_GUI set PASSWORD='" + newPass + "' WHERE EMAIL= '" + email + "'";
+                    console.log(colors.green('Query: %s'), sqlUpdate);
+                    connection.query(sqlUpdate, function(error, result)
+                    {
+                        connection.release();
+                        if(error) {
+                            callback(error, null);
+                        } else {
+                            callback('ok', 'ok');
+                        }
+                    });  // update
+                  }); // saltAndHash
+              }
+            });
+        } else {
+            callback('error', null);
+        }
+    });               
 }
 
 /* account lookup methods */
@@ -204,8 +205,6 @@ exports.deleteAccount = function(id, callback)
 
 exports.getAccountByEmail = function(email, callback)
 {
-	 //accounts.findOne({email:email}, function(e, o){ callback(o); });
-    
      pool.getConnection(function(err, connection) {
         if (connection) {        
             var sql = "SELECT USERNAME as user, PASSWORD as pass, EMAIL as email FROM USER_GUI WHERE EMAIL= '" + email + "'";
@@ -230,9 +229,28 @@ exports.getAccountByEmail = function(email, callback)
 
 exports.validateResetLink = function(email, passHash, callback)
 {
-	accounts.find({ $and: [{email:email, pass:passHash}] }, function(e, o){
-		callback(o ? 'ok' : null);
-	});
+    pool.getConnection(function(err, connection) {
+        if (connection) {        
+            var sql = "SELECT * FROM USER_GUI WHERE EMAIL= '" + email + "' and PASSWORD='" + passHash + "'" ;
+            console.log(colors.green('Query: %s'), sql);
+            connection.query(sql, function(error, rows)
+            {
+              connection.release();
+              if(error)
+              {
+                  console.log(colors.red('Query error: %s'), error);
+                  callback(null);
+              }
+              else
+              {
+                  callback('ok');
+              }
+            });
+        } else {
+            callback(null);
+        }
+    });      
+    
 }
 
 exports.getAllRecords = function(callback)
