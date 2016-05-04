@@ -1,6 +1,8 @@
 var crypto 		= require('crypto');
-var mysql         = require('mysql');
+var mysql       = require('mysql');
 var moment 		= require('moment');
+var crypt       = require('crypt3');
+
 var PropertiesReader = require('properties-reader');
 
 var properties = PropertiesReader('./kyrosview.properties');
@@ -11,11 +13,11 @@ var properties = PropertiesReader('./kyrosview.properties');
 
 var colors = require('colors');
 
-var dbMysqlName = process.env.DB_MYSQL_NAME || 'nodeLogin';
-var dbMysqlHost = process.env.DB_MYSQL_HOST || 'localhost'
-var dbMysqlPort = process.env.DB_MYSQL_PORT || 3306;
-var dbMysqlUser = process.env.DB_MYSQL_USER || 'root';
-var dbMysqlPass = process.env.DB_MYSQL_PASS || 'root';
+var dbMysqlName = properties.get('bbdd.mysql.name');
+var dbMysqlHost = properties.get('bbdd.mysql.ip');
+var dbMysqlPort = properties.get('bbdd.mysql.port');
+var dbMysqlUser = properties.get('bbdd.mysql.user');
+var dbMysqlPass = properties.get('bbdd.mysql.passwd');
 
 var dbConfig = {
     host: dbMysqlHost,
@@ -54,7 +56,7 @@ exports.autoLogin = function(user, pass, callback)
     });        
 }
 
-exports.manualLogin = function(user, pass, callback)
+exports.manualLogin = function(user, pass, callback) 
 {
     pool.getConnection(function(err, connection) {
         if (connection) {        
@@ -71,8 +73,15 @@ exports.manualLogin = function(user, pass, callback)
               }
               else
               {
-                  //var person = {firstName:"John", lastName:"Doe", age:50, eyeColor:"blue"};
-                  callback(null, rows[0]);
+                  var passDB = rows[0].password;
+                  console.log("Pass:" + pass);
+                  console.log("PassDB:" + passDB);
+                  
+                  if( crypt(pass,passDB) !== passDB) {
+                     callback(null);
+                  } else {
+                    callback(null, rows[0]);
+                  }
               }
             });
         } else {
@@ -80,7 +89,6 @@ exports.manualLogin = function(user, pass, callback)
         }
     });            
 }
-
 
 /* record insertion, update & deletion methods */
 exports.addNewAccount = function(newData, callback)
