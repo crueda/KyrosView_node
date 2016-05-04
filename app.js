@@ -14,6 +14,9 @@ var cookieParser = require('cookie-parser');
 //var MongoStore = require('connect-mongo')(session);
 var MySQLStore = require('express-mysql-session')(session);
 
+var PropertiesReader = require('properties-reader');
+var properties = PropertiesReader('./kyrosview.properties');
+
 var app = express();
 
 app.locals.pretty = true;
@@ -27,11 +30,11 @@ app.use(require('stylus').middleware({ src: __dirname + '/app/public' }));
 app.use(express.static(__dirname + '/app/public'));
 
 // build mysql database connection url //
-var dbMysqlName = process.env.DB_MYSQL_NAME || 'nodeLogin';
-var dbMysqlHost = process.env.DB_MYSQL_HOST || 'localhost'
-var dbMysqlPort = process.env.DB_MYSQL_PORT || 3306;
-var dbMysqlUser = process.env.DB_MYSQL_USER || 'root';
-var dbMysqlPass = process.env.DB_MYSQL_PASS || 'root';
+var dbMysqlName = properties.get('bbdd.mysql.name');
+var dbMysqlHost = properties.get('bbdd.mysql.ip');
+var dbMysqlPort = properties.get('bbdd.mysql.port');
+var dbMysqlUser = properties.get('bbdd.mysql.user');
+var dbMysqlPass = properties.get('bbdd.mysql.passwd');
 
 var options = {
     host: dbMysqlHost,

@@ -37,7 +37,7 @@ exports.autoLogin = function(user, pass, callback)
     pool.getConnection(function(err, connection) {
         if (connection) {        
             var sql = "SELECT USERNAME as username, PASSWORD as password FROM USER_GUI WHERE USERNAME= '" + user + "'";
-            console.log ("Query: "+sql);
+            console.log(colors.green('Query: %s'), sql);
             connection.query(sql, function(error, rows)
             {
               connection.release();
@@ -47,7 +47,12 @@ exports.autoLogin = function(user, pass, callback)
               }
               else
               {
-                  callback(rows);
+                  var passDB = rows[0].password;                  
+                  if( crypt(pass,passDB) !== passDB) {
+                     callback(null);
+                  } else {
+                    callback(null, rows[0]);
+                  }
               }
             });
         } else {
@@ -73,10 +78,7 @@ exports.manualLogin = function(user, pass, callback)
               }
               else
               {
-                  var passDB = rows[0].password;
-                  console.log("Pass:" + pass);
-                  console.log("PassDB:" + passDB);
-                  
+                  var passDB = rows[0].password;                  
                   if( crypt(pass,passDB) !== passDB) {
                      callback(null);
                   } else {
@@ -181,10 +183,9 @@ exports.updatePassword = function(email, newPass, callback)
               }
               else
               {
-                  // actualizar el password
-                  saltAndHash(newPass, function(hash){
-				    newPass = hash;
-                    var sqlUpdate = "UPDATE USER_GUI set PASSWORD='" + newPass + "' WHERE EMAIL= '" + email + "'";
+                  // actualizar la password
+                    var cryptPass = crypt(newPass);
+                    var sqlUpdate = "UPDATE USER_GUI set PASSWORD='" + cryptPass + "' WHERE EMAIL= '" + email + "'";
                     console.log(colors.green('Query: %s'), sqlUpdate);
                     connection.query(sqlUpdate, function(error, result)
                     {
@@ -195,7 +196,6 @@ exports.updatePassword = function(email, newPass, callback)
                             callback('ok', 'ok');
                         }
                     });  // update
-                  }); // saltAndHash
               }
             });
         } else {
