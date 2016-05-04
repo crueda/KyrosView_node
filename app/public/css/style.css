@@ -9,11 +9,6 @@ body {
   background: -o-radial-gradient(center, ellipse cover, #f2f9fe 0%, #d6f0fd 100%) /* Opera 12+ */;
   background: -ms-radial-gradient(center, ellipse cover, #f2f9fe 0%, #d6f0fd 100%) /* IE10+ */;
   background: radial-gradient(center, ellipse cover, #f2f9fe 0%, #d6f0fd 100%) /* W3C */;
-  background-image: url(/img/background_map.png);
-  background-position: 0% 0%;
-  //background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center; 
 }
 h2 {
   margin: 0 0 6px 0;

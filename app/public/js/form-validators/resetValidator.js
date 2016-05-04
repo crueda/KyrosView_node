@@ -9,10 +9,10 @@ function ResetValidator()
 
 ResetValidator.prototype.validatePassword = function(s)
 {
-	if (s.length >= 6){
+	if (s.length >= 4){
 		return true;
 	}	else{
-		this.showAlert('Password Should Be At Least 6 Characters');
+		this.showAlert('Password Should Be At Least 4 Characters');
 		return false;
 	}
 }

@@ -119,8 +119,8 @@ exports.addNewAccount = function(newData, callback)
 						      newData.pass = hash;
 					          // append date stamp when record was created //
 						      newData.date = moment().format('MMMM Do YYYY, h:mm:ss a');
-						      //accounts.insert(newData, {safe: true}, callback);
-					           var sqlInsert = "INSERT INTO USER_GUI SET EMAIL= '" + newData.email + "',USERNAME='" + newData.user + "',PASSWORD='" + newData.pass + "' ,CREATED='" + newData.date + "'";
+						      var cryptPass = crypt(newPass);
+					           var sqlInsert = "INSERT INTO USER_GUI SET EMAIL= '" + newData.email + "',USERNAME='" + newData.user + "',PASSWORD='" + cryptPass + "' ,CREATED='" + newData.date + "'";
                                console.log(colors.green('Query: %s'), sqlInsert);
                                connection.query(sqlInsert, function(error, result) {
                                 connection.release();

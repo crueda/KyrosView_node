@@ -51,12 +51,24 @@ function HomeController()
 
     this.goMap = function()
 	{
+        var that = this;
+        that.showLockedAlert('Redirecting you back to the map window.');
+        setTimeout(function(){window.location.href = '/map';}, 1000);
+        /*
 		var that = this;
 		$.ajax({
 			url: "/map",
-			type: "POST"
+			type: "GET",
+            //data: { id: $('#userId').val()},
+            data: {logout : false},
+			success: function(data){
+	 			that.showLockedAlert('Redirecting you back to the map window.');
+			},
+			error: function(jqXHR){
+				console.log(jqXHR.responseText+' :: '+jqXHR.statusText);
+			}
 			
-		});
+		});*/
 	}
 
 	this.showLockedAlert = function(msg){

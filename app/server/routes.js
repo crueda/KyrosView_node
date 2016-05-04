@@ -73,13 +73,6 @@ module.exports = function(app) {
                 user : req.session.user.username
 			});
             
-            //res.render('map', { title: 'ejs' })
-            //res.render('map2');
-			/*res.render('map', {
-				title : 'Kyros View',
-                countries : CT,
-				udata : req.session.user
-			});*/
 		}
 	});
 
@@ -90,11 +83,14 @@ module.exports = function(app) {
 		}	else{
             //res.sendFile(__dirname+'/web/map.html');
             //res.render('map');
-			res.render('map', {
+            res.render('map.ejs', {
+                user : req.session.user.username
+			});
+			/*res.render('map', {
 				title : 'Kyros View',
                 countries : CT,
 				udata : req.session.user
-			});
+			});*/
 		}
 	});
 
